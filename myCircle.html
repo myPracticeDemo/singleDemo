@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>myCircle</title>
+	<style>
+		*{
+			margin:0;
+			padding: 0;
+			list-style: none;
+		}
+		.config{
+			margin:20px;
+		}
+		.config span{
+			padding-right:10px;
+		}
+		.submit{
+			width:45px;
+			height:25px;
+			text-align:center;
+			line-height:25px;
+
+		}
+		/****************/
+		.circle-box{
+			margin:200px 250px;
+
+		}
+		.circle{
+			position:relative;
+		}
+		.circle li{
+			position:absolute;
+			width:50px;
+			height:50px;
+			line-height:50px;
+			text-align: center;
+			border-radius: 50%;
+			background: rgba(0,170,238,.65);
+			color:green;
+		}
+		.circle .circle2 li{
+			background:rgba(0,255,0,.65);
+			color:red;
+		}
+		/*.circle1 li:nth-child(1){transform: rotateY(0deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(2){transform: rotateY(40deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(3){transform: rotateY(80deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(4){transform: rotateY(120deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(5){transform: rotateY(160deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(6){transform: rotateY(200deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(7){transform: rotateY(240deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(8){transform: rotateY(280deg) translateZ(75px);}*/
+		/*.circle1 li:nth-child(9){transform: rotateY(320deg) translateZ(75px);}*/
+
+		/*.circle2 li:nth-child(1){transform: rotateX(0deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(2){transform: rotateX(40deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(3){transform: rotateX(80deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(4){transform: rotateX(120deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(5){transform: rotateX(160deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(6){transform: rotateX(200deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(7){transform: rotateX(240deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(8){transform: rotateX(280deg) translateZ(70px);}*/
+		/*.circle2 li:nth-child(9){transform: rotateX(320deg) translateZ(70px);}*/
+
+		@keyframes circle1{
+			from {transform: rotateY(0deg) rotateX(0deg)}
+			to {transform: rotateY(360deg) rotateX(360deg)}
+		}
+		@keyframes circle2{
+			from {transform: rotateX(0deg) rotateY(0deg)}
+			to {transform: rotateX(360deg) rotateY(360deg)}
+		}
+		@keyframes circle{
+			from {transform: rotateX(0deg) rotateY(0deg)}
+			to {transform: rotateX(360deg) rotateY(360deg)}
+		}
+		.circle1,.circle2{
+			width:50px;
+			height:50px;
+			position:absolute;
+			transform-style: preserve-3d;
+		}
+		.circle1{
+			/*animation:circle1 5s linear infinite;*/
+		}
+		.circle2{
+			/*animation:circle2 5s linear infinite;*/
+		}
+		.circle{
+			/*width:50px;*/
+			/*height:50px;*/
+			transform-style: preserve-3d;
+			/*animation:circle 5s linear infinite;*/
+		}
+	</style>
+</head>
+<body>
+	<div class="config">
+		<form action="">
+			<label for=""><span id="circle_number">单元环个数:</span><input type="text" value="9"/></label><br/><br/>
+			<label for=""><span id="circle_speed">旋转速率:</span><input type="text" value="5"/></label><br/><br/>
+			<input type="submit" class="submit" id="circle_submit" value="确定"/>
+		</form>
+	</div>
+	<div class="circle-box">
+		<div class="circle" id="circle">
+			<ul class="circle1" id="circle1">
+				<!--<li>1</li>-->
+				<!--<li>2</li>-->
+				<!--<li>3</li>-->
+				<!--<li>4</li>-->
+				<!--<li>5</li>-->
+				<!--<li>6</li>-->
+				<!--<li>7</li>-->
+				<!--<li>8</li>-->
+				<!--<li>9</li>-->
+			</ul>
+			<ul class="circle2" id="circle2">
+				<!--<li>1</li>-->
+				<!--<li>2</li>-->
+				<!--<li>3</li>-->
+				<!--<li>4</li>-->
+				<!--<li>5</li>-->
+				<!--<li>6</li>-->
+				<!--<li>7</li>-->
+				<!--<li>8</li>-->
+				<!--<li>9</li>-->
+			</ul>
+		</div>
+	</div>
+</body>
+<script>
+var page={
+	init:function(){
+		this.bindEvent();
+		this.refresh({id:"circle1",number:9,direction:"Y",step:75,speed:5});
+		this.refresh({id:"circle2",number:9,direction:"X",step:70,speed:5});
+	},
+	bindEvent:function(){
+		var self=this;
+		var circle_submit=document.getElementById("circle_submit");
+		circle_submit.addEventListener('click',function(e){
+			e.preventDefault();
+			var circle_number=parseInt(document.querySelectorAll("#circle_number+input")[0].value);
+			if(circle_number<1){
+				circle_number=1;
+			}
+			var circle_speed=document.querySelectorAll("#circle_speed+input")[0].value;
+			if(circle_speed<1){
+				circle_speed=1;
+			}
+			self.refresh({id:"circle1",number:circle_number||9,direction:"Y",step:75,speed:circle_speed||5});
+			self.refresh({id:"circle2",number:circle_number||9,direction:"X",step:70,speed:circle_speed||5});
+		});
+	},
+	refresh:function(options){
+		options || (options = {id:"circle1",number:9,direction:"Y",step:75,speed:5});
+		var el=document.getElementById(options.id);
+		el.innerHTML="";
+		var text="";
+		for(var i=1;i<=options.number;i++){
+			text+='<li style="transform: rotate'+options.direction+'('+(i-1)*360/options.number+'deg) translateZ('+options.step+'px);">'+i+'</li>';
+		}
+		el.innerHTML=text;
+		el.style.cssText='animation:'+options.id+' '+options.speed+'s linear infinite;';
+	}
+}
+page.init();
+</script>
+</html>
