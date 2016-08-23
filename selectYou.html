@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        select{
+            cursor: pointer;
+            width:150px;
+            margin-top:20px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<form action="#">
+    <div class="first-department">
+        <label>一级部门</label>：
+        <select name="first-department"  multiple>
+            <!--<option value="1">行政部</option>-->
+            <!--<option value="2">研发部</option>-->
+            <!--<option value="3">市场部</option>-->
+        </select>
+    </div>
+    <div class="second-department">
+        <label>二级部门</label>：
+        <select name="second-department"  multiple>
+
+        </select>
+    </div>
+    <div class="third-department">
+        <label>三级部门</label>：
+        <select name="third-department"  multiple>
+
+        </select>
+    </div>
+</form>
+</body>
+<script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    var depObj={
+        firstDep:["行政部","研发部","市场部"],
+        secDep:[["人事部","管理部","活动策划部"],["web开发","java开发","Android开发","ios开发"],["销售部","公关部","组织部"]],
+        thirDep:[
+            [["人事1部","人事2部"],["管理1部","管理2部"],["活动策划1部","活动策划2部"]],
+            [["web开发1部","web开发2部"],["java开发1部","java开发2部"],["Android开发1部","Android开发2部"],["ios开发1部","ios开发2部"]],
+            [["销售1部","销售2部"],["公关1部","公关2部"],["组织1部","组织2部","组织3部"]]
+        ]
+    }
+</script>
+<script>
+    var selectPage={
+        init:function(){
+            this.firArr=depObj.firstDep;
+            this.secArr=depObj.secDep;
+            this.thirArr=depObj.thirDep;
+            this.initSelect();
+            this.bindEvent();
+        },
+        initSelect:function(){
+            var self=this;
+            //初始化一级部门
+            this.refreshDep($("select[name='first-department']"),1);
+            //初始化二级部门
+            this.refreshDep($("select[name='second-department']"),2);
+            //初始化三级部门
+            this.refreshDep($("select[name='third-department']"),3);
+        },
+        mapArr:function(arr,firDepIndex,secDepIndex){
+            var text="";
+            //根据传入的参数不同，分别渲染不同的部门
+            var len=arguments.length;
+            arr.map(function(value,index){
+                var optVal="";
+                if(len==3){
+                    optVal=firDepIndex+"-"+secDepIndex+"-"+index;
+                }else if(len==2){
+                    optVal=firDepIndex+"-"+index;
+                }else{
+                    optVal=index;
+                }
+                text+='<option value="'+optVal+'">'+value+'</option>';
+            });
+            return text;
+        },
+        refreshDep:function(el,depgrade){
+            var text="";
+            var optVal="";
+            if(depgrade==3){//渲染三级部门的情况
+                for(var i=0;i<this.thirArr.length;i++){
+                    for(var j=0;j<this.thirArr[i].length;j++){
+                        text+=this.mapArr(this.thirArr[i][j],i,j);
+                    }
+                }
+            }else if(depgrade==2){//渲染二级部门的情况
+                for(var i=0;i<this.secArr.length;i++){
+                    text+=this.mapArr(this.secArr[i],i);
+                }
+            }else{//渲染一级部门的情况
+                text=this.mapArr(this.firArr);
+            }
+            el.html(text);
+        },
+        bindEvent:function(){
+            var self=this;
+            //一级部门change事件
+            $("select[name='first-department']").change(function(){
+                var optsSel=$(this).find("option:selected");
+                $("select[name='second-department'],select[name='third-department']").empty();
+                var secDepText=thirDepText="";
+                optsSel.each(function(){
+                    var indexOpt=$(this).attr("value");
+                    //渲染二级部门
+                    secDepText+=self.mapArr(self.secArr[indexOpt],indexOpt)
+                    $("select[name='second-department']").html(secDepText);
+                    //渲染三级部门
+                    for(var j=0;j<self.thirArr[indexOpt].length;j++){
+                        thirDepText+=self.mapArr(self.thirArr[indexOpt][j],indexOpt,j);
+                    }
+                    $("select[name='third-department']").html(thirDepText);
+                });
+            });
+            //二级部门change事件
+            $("select[name='second-department']").change(function(){
+                var optsSel=$(this).find("option:selected");
+                $("select[name='third-department']").empty();
+                $("select[name='first-department'] option").attr("selected",false);
+                var thirDepText="";
+                optsSel.each(function(){
+                    var indexOpt=$(this).attr("value");
+                    var firDepIndex=indexOpt.substr(0,1);
+                    //渲染一级部门，一级部门中哪些应该被选中
+                    $("select[name='first-department'] option").eq(firDepIndex).attr("selected",true);
+                    //渲染三级部门
+                    var secDepIndex=indexOpt.substr(2,1);
+                    thirDepText+=self.mapArr(self.thirArr[firDepIndex][secDepIndex],firDepIndex,secDepIndex);
+                    $("select[name='third-department']").html(thirDepText);
+                });
+            });
+            //三级部门change事件
+            $("select[name='third-department']").change(function(){
+                var optsSel=$(this).find("option:selected");
+                $("select[name='first-department'] option,select[name='second-department'] option").attr("selected",false);
+                optsSel.each(function(){
+                    var indexOpt=$(this).attr("value");
+                    var firDepIndex=indexOpt.substr(0,1);
+                    //渲染一级部门，一级部门中哪些应该被选中
+                    $("select[name='first-department'] option").eq(firDepIndex).attr("selected",true);
+                    //渲染二级部门，二级部门中的哪些应该被选中
+                    var secDepIndex=indexOpt.substr(2,1);
+                    $("select[name='second-department'] option").filter('[value='+firDepIndex+'-'+secDepIndex+']').attr("selected",true);
+                });
+            });
+        }
+    }
+    selectPage.init();
+</script>
+</html>
